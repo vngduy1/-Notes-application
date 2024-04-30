@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+package-lock.json
 dist
 dist-ssr
 *.local
@@ -26,7 +27,8 @@ dist-ssr
 
 #env
 .env.local
-/node_modules
+server/node_modules
+node_modules/
 .env
 
 firebase

@@ -1,23 +1,13 @@
 import { Box, Card, CardContent, Grid, List, Typography } from '@mui/material';
 import { useState } from 'react';
-import { Link, Outlet, useParams } from 'react-router-dom';
+import { Link, Outlet, useLoaderData, useParams } from 'react-router-dom';
 
 export default function NoteList() {
     const { noteId } = useParams();
+    const { folder } = useLoaderData();
+    console.log(folder);
     const [activeNoteId, setActiveNoteId] = useState(noteId);
 
-    const folder = {
-        notes: [
-            {
-                id: 1,
-                content: '<p>New note</p>',
-            },
-            {
-                id: 2,
-                content: '<p>New note2</p>',
-            },
-        ],
-    };
     return (
         <>
             <Grid container height={'100%'}>
@@ -43,48 +33,51 @@ export default function NoteList() {
                             </Box>
                         }
                     >
-                        {folder.notes.map(({ id, content }) => {
-                            return (
-                                <Link
-                                    key={id}
-                                    to={`note/${id}`}
-                                    style={{ textDecoration: 'none' }}
-                                    onClick={() => setActiveNoteId(id)}
-                                >
-                                    <Card
-                                        sx={{
-                                            mb: '5px',
-                                            backgroundColor:
-                                                id === activeNoteId
-                                                    ? 'rgb(255 211 140)'
-                                                    : '',
-                                        }}
+                        {folder &&
+                            folder.notes.map(({ id, content }) => {
+                                return (
+                                    <Link
+                                        key={id}
+                                        to={`note/${id}`}
+                                        style={{ textDecoration: 'none' }}
+                                        onClick={() => setActiveNoteId(id)}
                                     >
-                                        <CardContent
+                                        <Card
                                             sx={{
-                                                '&:last-child': { pb: '10px' },
-                                                padding: '10px',
+                                                mb: '5px',
+                                                backgroundColor:
+                                                    id === activeNoteId
+                                                        ? 'rgb(255 211 140)'
+                                                        : '',
                                             }}
                                         >
-                                            <div
-                                                style={{
-                                                    fontSize: 14,
-                                                    fontWeight: 'bold',
+                                            <CardContent
+                                                sx={{
+                                                    '&:last-child': {
+                                                        pb: '10px',
+                                                    },
+                                                    padding: '10px',
                                                 }}
-                                                dangerouslySetInnerHTML={{
-                                                    __html: `${
-                                                        content.substring(
-                                                            0,
-                                                            30,
-                                                        ) || 'Empty'
-                                                    }`,
-                                                }}
-                                            ></div>
-                                        </CardContent>
-                                    </Card>
-                                </Link>
-                            );
-                        })}
+                                            >
+                                                <div
+                                                    style={{
+                                                        fontSize: 14,
+                                                        fontWeight: 'bold',
+                                                    }}
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: `${
+                                                            content.substring(
+                                                                0,
+                                                                30,
+                                                            ) || 'Empty'
+                                                        }`,
+                                                    }}
+                                                ></div>
+                                            </CardContent>
+                                        </Card>
+                                    </Link>
+                                );
+                            })}
                     </List>
                 </Grid>
                 <Grid item xs={8}>

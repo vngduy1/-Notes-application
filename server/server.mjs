@@ -11,6 +11,7 @@ import { typeDefs } from "./schema/index.js";
 dotenv.config();
 import mongoose from "mongoose";
 import "./firebaseConfig.js";
+import { getAuth } from "firebase-admin/auth";
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -26,8 +27,41 @@ const server = new ApolloServer({
 
 await server.start();
 
+const authorizationJWT = async (req, res, next) => {
+  const authorizationHeader = req.headers.authorization;
+
+  if (authorizationHeader) {
+    console.log({ authorization: req.headers.authorization });
+    const accessToken = authorizationHeader.split(" ")[1];
+
+    getAuth()
+      .verifyIdToken(accessToken)
+      .then((decodedToken) => {
+        console.log({ decodedToken });
+        res.locals.uid = decodedToken.uid;
+        next();
+      })
+      .catch((e) => {
+        console.log(e);
+        return res.status(403).json({ message: "Forbidden", error: e });
+      });
+  } else {
+    // return res.status(401).json({ message: "Unauthorized" });
+    next();
+  }
+};
+
 //middleware
-app.use(cors(), bodyParser.json(), expressMiddleware(server));
+app.use(
+  cors(),
+  authorizationJWT,
+  bodyParser.json(),
+  expressMiddleware(server, {
+    context: async ({ req, res }) => {
+      return { uid: res.locals.uid };
+    },
+  })
+);
 
 mongoose
   .connect(URL)
